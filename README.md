@@ -1,46 +1,48 @@
-# Getting Started with Create React App
+Irteya (React + TypeScript App)
+Это приложение создано с использованием React и TypeScript в рамках тестового задания для трудоустройства.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Установка и запуск
 
-## Available Scripts
+Клонируйте репозиторий (если нужно):
+git clone https://github.com/NSchenikov/irteya
+Перейдите в папку проекта:
+cd irteya
+Установите зависимости:
+npm i
+или
+npm install
+Запустите приложение в режиме разработки:
+npm run start
+После запуска приложение откроется автоматически в браузере по адресу: http://localhost:3000 (порт может отличаться в зависимости от настроек).
+Доступные команды
 
-In the project directory, you can run:
+npm start – запуск dev-сервера.
+npm run build – сборка production-версии в папку build.
 
-### `yarn start`
+Технологии
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+React (функциональные компоненты, хуки)
+TypeScript – статическая типизация
+Сборка: Create React App (CRA)
+Стили: CSS
+Дополнительно: Redux / React Router / Axios (если есть)
+Структура проекта
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+/src
+/components – React-компоненты
+/pages – Страницы приложения
+/styles – Глобальные стили
+/utils – Вспомогательные функции
+/types – Типы TypeScript
+App.tsx – Главный компонент
+index.tsx – Точка входа
 
-### `yarn test`
+Деплой
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Для деплоя на GitHub Pages, Vercel, Netlify или другой хостинг используйте:
+npm run build
+После этого загрузите содержимое папки build на хостинг.
 
-### `yarn build`
+Лицензия
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+MIT © NSchenikov
