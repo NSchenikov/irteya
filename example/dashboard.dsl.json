@@ -1,0 +1,22 @@
+{
+    "charts": [
+      {
+        "title": "Продажи по месяцам",
+        "type": "linear",
+        "colors": ["#FF0000", "#00FF00", "#0000FF"],
+        "metrics": ["sales", "revenue", "profit"]
+      },
+      {
+        "title": "Количество пользователей",
+        "type": "area",
+        "colors": ["#FF00FF", "#00FFFF"],
+        "metrics": ["users"]
+      },
+      {
+        "title": "Расходы",
+        "type": "bar",
+        "colors": ["#FFA500"],
+        "metrics": ["expenses"]
+      }
+    ]
+  }
