@@ -21,6 +21,10 @@ export interface JSONSchema {
 export interface Field {
   name: string;
   label: string;
-  type: 'string' | 'number' | 'integer' | 'boolean' | 'enum';
-  options?: string[];
+  type: 'string' | 'number' | 'integer' | 'boolean' | 'enum' | 'array' | 'object';
+  options?: string[]; 
+  items?: Field;      
+  properties?: Field[]; 
+  rules?: any;
 }
+
