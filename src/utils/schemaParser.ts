@@ -1,10 +1,11 @@
+import { JSONSchema, Field, ValidationRules } from '../types/schema';
 
+function buildRules(schema: JSONSchema, isRequired: boolean, fieldName: string): ValidationRules {
+  const rules: ValidationRules = {};
 
-import { JSONSchema, Field } from '../types/schema';
-
-
-function buildRules(schema: JSONSchema): any {
-  const rules: any = {};
+  if (isRequired) {
+    rules.required = `${fieldName} обязательно`;
+  }
 
   if (schema.type === 'string') {
     if (schema.minLength !== undefined) {
@@ -37,24 +38,16 @@ function buildRules(schema: JSONSchema): any {
   }
 
   if (schema.type === 'array') {
-    const minItems = schema.minItems;
-    const maxItems = schema.maxItems;
-
-    if (minItems !== undefined) {
-      rules.validate = (value: any[]) =>
-        (value?.length ?? 0) >= minItems
-          ? true
-          : `Минимум ${minItems} элементов`;
+    if (schema.minItems !== undefined) {
+      rules.minItems = {
+        value: schema.minItems,
+        message: `Минимум ${schema.minItems} элементов`,
+      };
     }
-    if (maxItems !== undefined) {
-      const previousValidate = rules.validate;
-      rules.validate = (value: any[]) => {
-        if (previousValidate && previousValidate(value) !== true) {
-          return previousValidate(value);
-        }
-        return (value?.length ?? 0) <= maxItems
-          ? true
-          : `Максимум ${maxItems} элементов`;
+    if (schema.maxItems !== undefined) {
+      rules.maxItems = {
+        value: schema.maxItems,
+        message: `Максимум ${schema.maxItems} элементов`,
       };
     }
   }
@@ -68,38 +61,24 @@ export function parseSchema(schema: JSONSchema, parentKey = '', parentRequired: 
       const fullKey = parentKey ? `${parentKey}.${key}` : key;
       const isRequired = parentRequired.includes(key);
 
-      return {
+      const field: Field = {
         name: fullKey,
         label: key,
         type: value.enum ? 'enum' : (value.type as Field['type']),
         options: value.enum,
-        rules: {
-          ...(buildRules(value)),
-          ...(isRequired ? {
-            validate: (v: any) => {
-              if (typeof v === 'string') {
-                return v.trim() !== '' || `Поле "${key}" обязательно`;
-              }
-              if (typeof v === 'number' || typeof v === 'boolean') {
-                return v !== null && v !== undefined || `Поле "${key}" обязательно`;
-              }
-              if (Array.isArray(v)) {
-                return v.length > 0 || `Поле "${key}" обязательно`;
-              }
-              if (typeof v === 'object') {
-                return v !== null || `Поле "${key}" обязательно`;
-              }
-              return `Поле "${key}" обязательно`;
-            }
-          } : {}),
-        },
-        ...(value.type === 'object'
-          ? { properties: parseSchema(value, fullKey, value.required || []) }
-          : {}),
-        ...(value.type === 'array'
-          ? { items: parseSchema(value.items!, fullKey, value.items?.required || [])[0], rules: buildRules(value) }
-          : {}),
+        rules: buildRules(value, isRequired, key),
       };
+
+      if (value.type === 'object') {
+        field.properties = parseSchema(value, fullKey, value.required || []);
+      }
+
+      if (value.type === 'array' && value.items) {
+        field.type = 'array';
+        field.items = parseSchema(value.items, fullKey, value.items.required || [])[0];
+      }
+
+      return field;
     });
   }
 
@@ -114,29 +93,18 @@ export function parseSchema(schema: JSONSchema, parentKey = '', parentRequired: 
         label: parentKey,
         type: 'enum',
         options: schema.enum,
-        rules: {},
+        rules: buildRules(schema, false, parentKey),
       },
     ];
   }
 
-  if (schema.type === 'string' || schema.type === 'boolean') {
+  if (['string', 'boolean', 'integer', 'number'].includes(schema.type)) {
     return [
       {
         name: parentKey,
         label: parentKey,
-        type: schema.type,
-        rules: buildRules(schema),
-      },
-    ];
-  }
-
-  if (schema.type === 'integer' || schema.type === 'number') {
-    return [
-      {
-        name: parentKey,
-        label: parentKey,
-        type: 'number',
-        rules: buildRules(schema),
+        type: schema.type === 'integer' ? 'number' : schema.type,
+        rules: buildRules(schema, false, parentKey),
       },
     ];
   }

@@ -28,3 +28,14 @@ export interface Field {
   rules?: any;
 }
 
+export type ValidationRules = {
+  required?: string;
+  minLength?: { value: number; message: string };
+  maxLength?: { value: number; message: string };
+  min?: { value: number; message: string };
+  max?: { value: number; message: string };
+  minItems?: { value: number; message: string };
+  maxItems?: { value: number; message: string };
+  pattern?: { value: RegExp; message: string };
+};
+
