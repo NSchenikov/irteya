@@ -39,3 +39,7 @@ export type ValidationRules = {
   pattern?: { value: RegExp; message: string };
 };
 
+export type FormValues = {
+  [key: string]: any;
+};
+

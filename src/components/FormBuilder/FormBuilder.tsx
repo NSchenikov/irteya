@@ -1,8 +1,8 @@
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import { Box, Button, Typography } from '@mui/material';
 import { parseSchema } from '../../utils/schemaParser';
 import FormField from './FormField';
-import { JSONSchema } from '../../types/schema';
+import { JSONSchema, FormValues } from '../../types/schema';
 import { useState } from 'react';
 
 interface FormBuilderProps {
@@ -10,21 +10,21 @@ interface FormBuilderProps {
 }
 
 const FormBuilder: React.FC<FormBuilderProps> = ({ schema }) => {
-  const methods = useForm({
+  const methods = useForm<FormValues>({
     defaultValues: {},
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
 
-  const [result, setResult] = useState<any>(null);
+  const [submitResult, setSubmitResult] = useState<FormValues | null>(null);
 
   const { handleSubmit } = methods;
 
   const fields = parseSchema(schema, '', schema.required || []);
 
-  const onSubmit = (data: any) => {
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
     console.log('Form Data:', data);
-    setResult(data);
+    setSubmitResult(data);
   };
 
   return (
@@ -40,10 +40,10 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ schema }) => {
         </Button>
       </form>
 
-      {result && (
+      {submitResult && (
         <Box mt={4}>
           <Typography variant="h6">Результат отправки:</Typography>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+          <pre>{JSON.stringify(submitResult, null, 2)}</pre>
         </Box>
       )}
     </FormProvider>
