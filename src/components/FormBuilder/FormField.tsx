@@ -21,8 +21,24 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
     const { fields, append, remove } = fieldArray;
 
     return (
-      <Box>
+      <Box mb={3}>
         <Typography variant="h6" sx={{ mb: 1 }}>{field.label}</Typography>
+
+        <Controller
+          name={field.name}
+          control={control}
+          rules={field.rules}
+          render={({ fieldState }) => (
+            <>
+              {fieldState.error && (
+                <Typography variant="caption" color="error">
+                  {fieldState.error.message}
+                </Typography>
+              )}
+            </>
+          )}
+        />
+
         {fields.map((item, index) => (
           <Box key={item.id} display="flex" alignItems="center" gap={1} mb={2}>
             {field.items && (
@@ -59,6 +75,19 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
     );
   }
 
+  if (field.type === 'object' && field.properties) {
+    return (
+      <Box mb={3} pl={2} borderLeft="2px solid #eee">
+        <Typography variant="subtitle1" sx={{ mb: 1 }}>
+          {field.label}
+        </Typography>
+        {field.properties.map((subField) => (
+          <FormField key={subField.name} field={subField} />
+        ))}
+      </Box>
+    );
+  }
+
   switch (field.type) {
     case 'string':
     case 'number':
@@ -68,16 +97,23 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
           control={control}
           rules={field.rules}
           defaultValue=""
-          render={({ field: controllerField, fieldState }) => (
-            <TextField
-              {...controllerField}
-              label={field.label}
-              type={field.type === 'string' ? 'text' : 'number'}
-              fullWidth
-              error={!!fieldState.error}
-              helperText={fieldState.error?.message}
-            />
-          )}
+          render={({ field: { onChange, onBlur, value, ref }, fieldState }) => {
+            console.log('Field:', field.name, 'Error:', fieldState.error);
+            return (
+              <TextField
+                inputRef={ref}
+                value={value ?? ''}
+                onChange={onChange}
+                onBlur={onBlur}
+                label={field.label}
+                type={field.type === 'string' ? 'text' : 'number'}
+                fullWidth
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                margin="normal"
+              />
+            );
+          }}
         />
       );
     case 'boolean':
@@ -87,9 +123,16 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
           control={control}
           rules={field.rules}
           defaultValue={false}
-          render={({ field: controllerField }) => (
+          render={({ field: { onChange, onBlur, value, ref } }) => (
             <FormControlLabel
-              control={<Checkbox {...controllerField} checked={!!controllerField.value} />}
+              control={
+                <Checkbox
+                  inputRef={ref}
+                  checked={!!value}
+                  onChange={(e) => onChange(e.target.checked)}
+                  onBlur={onBlur}
+                />
+              }
               label={field.label}
             />
           )}
@@ -102,10 +145,16 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
           control={control}
           rules={field.rules}
           defaultValue=""
-          render={({ field: controllerField, fieldState }) => (
-            <FormControl fullWidth error={!!fieldState.error}>
+          render={({ field: { onChange, onBlur, value, ref }, fieldState }) => (
+            <FormControl fullWidth margin="normal" error={!!fieldState.error}>
               <InputLabel>{field.label}</InputLabel>
-              <Select {...controllerField} label={field.label}>
+              <Select
+                inputRef={ref}
+                value={value ?? ''}
+                onChange={onChange}
+                onBlur={onBlur}
+                label={field.label}
+              >
                 {field.options?.map((option) => (
                   <MenuItem key={option} value={option}>
                     {option}

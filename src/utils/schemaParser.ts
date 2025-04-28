@@ -2,6 +2,7 @@
 
 import { JSONSchema, Field } from '../types/schema';
 
+
 function buildRules(schema: JSONSchema): any {
   const rules: any = {};
 
@@ -35,6 +36,29 @@ function buildRules(schema: JSONSchema): any {
     }
   }
 
+  if (schema.type === 'array') {
+    const minItems = schema.minItems;
+    const maxItems = schema.maxItems;
+
+    if (minItems !== undefined) {
+      rules.validate = (value: any[]) =>
+        (value?.length ?? 0) >= minItems
+          ? true
+          : `Минимум ${minItems} элементов`;
+    }
+    if (maxItems !== undefined) {
+      const previousValidate = rules.validate;
+      rules.validate = (value: any[]) => {
+        if (previousValidate && previousValidate(value) !== true) {
+          return previousValidate(value);
+        }
+        return (value?.length ?? 0) <= maxItems
+          ? true
+          : `Максимум ${maxItems} элементов`;
+      };
+    }
+  }
+
   return rules;
 }
 
@@ -42,7 +66,7 @@ export function parseSchema(schema: JSONSchema, parentKey = '', parentRequired: 
   if (schema.type === 'object' && schema.properties) {
     return Object.entries(schema.properties).map(([key, value]) => {
       const fullKey = parentKey ? `${parentKey}.${key}` : key;
-      const isRequired = schema.required?.includes(key);
+      const isRequired = parentRequired.includes(key);
 
       return {
         name: fullKey,
@@ -51,10 +75,14 @@ export function parseSchema(schema: JSONSchema, parentKey = '', parentRequired: 
         options: value.enum,
         rules: {
           ...(buildRules(value)),
-          ...(isRequired ? { required: `Поле ${key} обязательно` } : {}),
+          ...(isRequired ? { required: `Поле "${key}" обязательно` } : {}),
         },
-        ...(value.type === 'object' ? { properties: parseSchema(value, fullKey, value.required || []) } : {}),
-        ...(value.type === 'array' ? { items: parseSchema(value.items!, fullKey, value.items?.required || [])[0] } : {}),
+        ...(value.type === 'object'
+          ? { properties: parseSchema(value, fullKey, value.required || []) }
+          : {}),
+        ...(value.type === 'array'
+          ? { items: parseSchema(value.items!, fullKey, value.items?.required || [])[0], rules: buildRules(value) }
+          : {}),
       };
     });
   }

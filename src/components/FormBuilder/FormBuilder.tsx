@@ -1,4 +1,4 @@
-// src/components/FormBuilder/FormBuilder.tsx
+
 
 import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -13,11 +13,15 @@ interface FormBuilderProps {
 }
 
 const FormBuilder: React.FC<FormBuilderProps> = ({ schema, onSubmit }) => {
-  const methods = useForm({ defaultValues: {} });
+  const methods = useForm({
+    defaultValues: {},
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+  });
 
   const { handleSubmit } = methods;
 
-  const fields = parseSchema(schema);
+  const fields = parseSchema(schema, '', schema.required || []);
 
   return (
     <FormProvider {...methods}>
