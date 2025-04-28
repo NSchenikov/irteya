@@ -15,7 +15,7 @@ function App() {
       <Typography variant="h4" align="center" gutterBottom>
         Dynamic Form
       </Typography>
-      <FormBuilder schema={schema as any} onSubmit={handleSubmit} />
+      <FormBuilder schema={schema as any} />
     </Container>
   );
 }

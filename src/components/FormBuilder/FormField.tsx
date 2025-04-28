@@ -97,12 +97,12 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
           control={control}
           rules={field.rules}
           defaultValue=""
-          render={({ field: { onChange, onBlur, value, ref }, fieldState }) => {
-            console.log('Field:', field.name, 'Error:', fieldState.error);
+          render={({ field: { onChange, onBlur, value = '', ref }, fieldState }) => {
+            // console.log('TEXT FIELD VALUE:', field.name, value);
             return (
               <TextField
                 inputRef={ref}
-                value={value ?? ''}
+                value={value}
                 onChange={onChange}
                 onBlur={onBlur}
                 label={field.label}
@@ -123,7 +123,7 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
           control={control}
           rules={field.rules}
           defaultValue={false}
-          render={({ field: { onChange, onBlur, value, ref } }) => (
+          render={({ field: { onChange, onBlur, value = false, ref } }) => (
             <FormControlLabel
               control={
                 <Checkbox
@@ -145,12 +145,12 @@ const FormField: React.FC<FormFieldProps> = ({ field }) => {
           control={control}
           rules={field.rules}
           defaultValue=""
-          render={({ field: { onChange, onBlur, value, ref }, fieldState }) => (
+          render={({ field: { onChange, onBlur, value = '', ref }, fieldState }) => (
             <FormControl fullWidth margin="normal" error={!!fieldState.error}>
               <InputLabel>{field.label}</InputLabel>
               <Select
                 inputRef={ref}
-                value={value ?? ''}
+                value={field.options?.includes(value) ? value : ''}
                 onChange={onChange}
                 onBlur={onBlur}
                 label={field.label}

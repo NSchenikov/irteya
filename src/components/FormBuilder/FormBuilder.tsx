@@ -1,27 +1,31 @@
-
-
-import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Button, Box } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
+import { parseSchema } from '../../utils/schemaParser';
 import FormField from './FormField';
 import { JSONSchema } from '../../types/schema';
-import { parseSchema } from '../../utils/schemaParser';
+import { useState } from 'react';
 
 interface FormBuilderProps {
   schema: JSONSchema;
-  onSubmit: (data: any) => void;
 }
 
-const FormBuilder: React.FC<FormBuilderProps> = ({ schema, onSubmit }) => {
+const FormBuilder: React.FC<FormBuilderProps> = ({ schema }) => {
   const methods = useForm({
     defaultValues: {},
-    mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
+    mode: 'onChange',         
+    reValidateMode: 'onChange',
   });
+
+  const [result, setResult] = useState<any>(null);
 
   const { handleSubmit } = methods;
 
   const fields = parseSchema(schema, '', schema.required || []);
+
+  const onSubmit = (data: any) => {
+    console.log('Form Data:', data);
+    setResult(data);
+  };
 
   return (
     <FormProvider {...methods}>
@@ -30,12 +34,18 @@ const FormBuilder: React.FC<FormBuilderProps> = ({ schema, onSubmit }) => {
           {fields.map((field) => (
             <FormField key={field.name} field={field} />
           ))}
-
-          <Button type="submit" variant="contained">
-            Submit
-          </Button>
         </Box>
+        <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+          Отправить
+        </Button>
       </form>
+
+      {result && (
+        <Box mt={4}>
+          <Typography variant="h6">Результат отправки:</Typography>
+          <pre>{JSON.stringify(result, null, 2)}</pre>
+        </Box>
+      )}
     </FormProvider>
   );
 };

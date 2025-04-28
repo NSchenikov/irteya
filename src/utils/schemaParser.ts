@@ -75,7 +75,23 @@ export function parseSchema(schema: JSONSchema, parentKey = '', parentRequired: 
         options: value.enum,
         rules: {
           ...(buildRules(value)),
-          ...(isRequired ? { required: `Поле "${key}" обязательно` } : {}),
+          ...(isRequired ? {
+            validate: (v: any) => {
+              if (typeof v === 'string') {
+                return v.trim() !== '' || `Поле "${key}" обязательно`;
+              }
+              if (typeof v === 'number' || typeof v === 'boolean') {
+                return v !== null && v !== undefined || `Поле "${key}" обязательно`;
+              }
+              if (Array.isArray(v)) {
+                return v.length > 0 || `Поле "${key}" обязательно`;
+              }
+              if (typeof v === 'object') {
+                return v !== null || `Поле "${key}" обязательно`;
+              }
+              return `Поле "${key}" обязательно`;
+            }
+          } : {}),
         },
         ...(value.type === 'object'
           ? { properties: parseSchema(value, fullKey, value.required || []) }
