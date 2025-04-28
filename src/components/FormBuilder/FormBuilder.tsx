@@ -12,7 +12,7 @@ interface FormBuilderProps {
 const FormBuilder: React.FC<FormBuilderProps> = ({ schema }) => {
   const methods = useForm({
     defaultValues: {},
-    mode: 'onChange',         
+    mode: 'onChange',
     reValidateMode: 'onChange',
   });
 
